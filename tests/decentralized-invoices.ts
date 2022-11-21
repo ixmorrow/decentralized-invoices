@@ -3,7 +3,7 @@ import { Program } from "@project-serum/anchor"
 import { DecentralizedInvoices } from "../target/types/decentralized_invoices"
 import { PublicKey, Keypair, SystemProgram } from '@solana/web3.js'
 import { numbersToBuffer } from 'numbers-to-buffer'
-import { createMint, mintTo, getOrCreateAssociatedTokenAccount } from '@solana/spl-token'
+import { createMint, mintTo, getOrCreateAssociatedTokenAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { safeAirdrop, delay } from './utils/utils'
 import { token } from "@project-serum/anchor/dist/cjs/utils"
 import { merchantKeypair as merchant, customerKeypair as customer, mintAuth } from './test-keypairs/testKeypairs'
@@ -75,7 +75,28 @@ describe("decentralized-invoices", async () => {
     })
     .signers([merchant])
     .rpc()
-    console.log("Your transaction signature", tx)
+    console.log("Invoice created: ", tx)
+  })
+
+  it("Pay Invoice", async () => {
+    let uuid = new anchor.BN(1)
+    const [invoicePda, invoiceBump] = await PublicKey.findProgramAddress(
+      [uuid.toArrayLike(Buffer, 'le', 8), Buffer.from("invoice"), merchant.publicKey.toBuffer()],
+      program.programId
+    )
+    const tx = await program.methods.payInvoice()
+    .accounts({
+      invoice: invoicePda,
+      customer: customer.publicKey,
+      merchant: merchant.publicKey,
+      customerTokenAcct: customerAta.address,
+      merchantTokenAcct: merchantAta.address,
+      paymentMint: tokenMint,
+      tokenProgram: TOKEN_PROGRAM_ID
+    })
+    .signers([customer])
+    .rpc()
+    console.log("Invoice paid: ", tx)
   })
 
 })

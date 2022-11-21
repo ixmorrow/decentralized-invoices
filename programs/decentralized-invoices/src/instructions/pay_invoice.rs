@@ -45,11 +45,13 @@ pub struct PayInvoice<'info> {
     #[account(
         constraint = customer_token_acct.mint.key() == payment_mint.key()
     )]
+    #[account(mut)]
     pub customer_token_acct: Account<'info, TokenAccount>,
     #[account(
         associated_token::mint = payment_mint,
         associated_token::authority = merchant
     )]
+    #[account(mut)]
     pub merchant_token_acct: Account<'info, TokenAccount>,
     #[account(
         constraint = payment_mint.key() == invoice.currency.unwrap()
@@ -62,7 +64,7 @@ impl<'info> PayInvoice <'info> {
     pub fn transfer_ctx(&self) -> CpiContext<'_, '_, '_, 'info, Transfer<'info>> {
         let cpi_program = self.token_program.to_account_info();
         let cpi_accounts = Transfer {
-            from: self.customer.to_account_info(),
+            from: self.customer_token_acct.to_account_info(),
             to: self.merchant_token_acct.to_account_info(),
             authority: self.customer.to_account_info()
         };
