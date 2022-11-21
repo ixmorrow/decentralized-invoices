@@ -1,7 +1,7 @@
 import * as anchor from "@project-serum/anchor"
 import { Program } from "@project-serum/anchor"
 import { DecentralizedInvoices } from "../target/types/decentralized_invoices"
-import { PublicKey, Keypair, SystemProgram } from '@solana/web3.js'
+import { PublicKey, Keypair, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { numbersToBuffer } from 'numbers-to-buffer'
 import { createMint, mintTo, getOrCreateAssociatedTokenAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { safeAirdrop, delay } from './utils/utils'
@@ -17,12 +17,14 @@ describe("decentralized-invoices", async () => {
   let tokenMint = null
   let merchantAta = null
   let customerAta = null
+  let firstId = null
+  let secondId = null
 
   it("Initialize accounts", async () => {
     await safeAirdrop(merchant.publicKey, provider.connection)
     await safeAirdrop(customer.publicKey, provider.connection)
     await safeAirdrop(mintAuth.publicKey, provider.connection)
-    await safeAirdrop(provider.wallet.publicKey, provider.connection)
+
     delay(10000)
 
     tokenMint = await createMint(
@@ -55,17 +57,17 @@ describe("decentralized-invoices", async () => {
       tokenMint,
       customerAta.address,
       mintAuth,
-      100
+      100*LAMPORTS_PER_SOL
     )
   })
 
   it("Create Invoice", async () => {
-    let uuid = new anchor.BN(1)
+    firstId = new anchor.BN(Math.floor(Math.random() * 100))
     const [invoicePda, invoiceBump] = await PublicKey.findProgramAddress(
-      [uuid.toArrayLike(Buffer, 'le', 8), Buffer.from("invoice"), merchant.publicKey.toBuffer()],
+      [firstId.toArrayLike(Buffer, 'le', 8), Buffer.from("invoice"), merchant.publicKey.toBuffer()],
       program.programId
     )
-    const tx = await program.methods.createInvoice(uuid, new anchor.BN(5))
+    const tx = await program.methods.createInvoice(firstId, new anchor.BN(5*LAMPORTS_PER_SOL))
     .accounts({
       merchant: merchant.publicKey,
       customer: customer.publicKey,
@@ -79,9 +81,8 @@ describe("decentralized-invoices", async () => {
   })
 
   it("Pay Invoice", async () => {
-    let uuid = new anchor.BN(1)
     const [invoicePda, invoiceBump] = await PublicKey.findProgramAddress(
-      [uuid.toArrayLike(Buffer, 'le', 8), Buffer.from("invoice"), merchant.publicKey.toBuffer()],
+      [firstId.toArrayLike(Buffer, 'le', 8), Buffer.from("invoice"), merchant.publicKey.toBuffer()],
       program.programId
     )
     const tx = await program.methods.payInvoice()
@@ -100,12 +101,12 @@ describe("decentralized-invoices", async () => {
   })
 
   it("Create Second Invoice", async () => {
-    let uuid = new anchor.BN(2)
+    secondId = new anchor.BN(Math.floor(Math.random() * 100))
     const [invoicePda, invoiceBump] = await PublicKey.findProgramAddress(
-      [uuid.toArrayLike(Buffer, 'le', 8), Buffer.from("invoice"), merchant.publicKey.toBuffer()],
+      [secondId.toArrayLike(Buffer, 'le', 8), Buffer.from("invoice"), merchant.publicKey.toBuffer()],
       program.programId
     )
-    const tx = await program.methods.createInvoice(uuid, new anchor.BN(5))
+    const tx = await program.methods.createInvoice(secondId, new anchor.BN(5*LAMPORTS_PER_SOL))
     .accounts({
       merchant: merchant.publicKey,
       customer: customer.publicKey,
@@ -120,9 +121,8 @@ describe("decentralized-invoices", async () => {
 
   it("Expire Invoice", async () => {
     await delay(2000)
-    let uuid = new anchor.BN(2)
     const [invoicePda, invoiceBump] = await PublicKey.findProgramAddress(
-      [uuid.toArrayLike(Buffer, 'le', 8), Buffer.from("invoice"), merchant.publicKey.toBuffer()],
+      [secondId.toArrayLike(Buffer, 'le', 8), Buffer.from("invoice"), merchant.publicKey.toBuffer()],
       program.programId
     )
     const tx = await program.methods.expireInvoice()
@@ -134,6 +134,4 @@ describe("decentralized-invoices", async () => {
     .rpc()
     console.log("Invoice expired: ", tx)
   })
-
-
 })

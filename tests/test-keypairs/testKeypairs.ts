@@ -1,4 +1,4 @@
-import { Keypair } from '@solana/web3.js'
+import { PublicKey, Keypair } from '@solana/web3.js'
 
 export const merchantKeypair =  Keypair.fromSecretKey(Uint8Array.from([
     228, 159,  12,   0, 222,   6, 106, 251, 248,  46, 246,
@@ -26,3 +26,5 @@ export const mintAuth =  Keypair.fromSecretKey(Uint8Array.from([
     6, 120, 173,   9, 149, 139, 237, 188,  92, 249,  41,
     130,  49,  88, 126,  61,  98,  92,  25, 106
 ]))
+
+//export const tokenMint = new PublicKey("3p9y5eemKssJwBTGz2XUG45jwJDbwVxhQJJjrnfquRhS")
