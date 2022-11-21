@@ -17,6 +17,10 @@ pub fn handler(ctx: Context<UpdateInvoice>, ix: UpdateInvoiceIx) -> Result<()> {
     invoice.amount = ix.amount;
 
     msg!("Invoice updated: {}", invoice.uuid);
+    emit!(CreateInvoiceEvent{
+        topic: "Invoice updated".to_string(),
+        uuid: invoice.uuid
+    });
 
     Ok(())
 }

@@ -19,6 +19,10 @@ pub fn handler(ctx: Context<CreateInvoice>, uuid: u64, amount: u64) -> Result<()
     invoice.bump = *ctx.bumps.get("invoice").unwrap();
 
     msg!("Invoice created - uuid: {}", invoice.uuid);
+    emit!(CreateInvoiceEvent{
+        topic: "Invoice created".to_string(),
+        uuid: invoice.uuid
+    });
 
     Ok(())
 }

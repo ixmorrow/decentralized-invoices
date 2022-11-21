@@ -14,6 +14,7 @@ pub fn handler(ctx: Context<ExpireInvoice>) -> Result<()> {
     // );
     msg!("Current timestamp: {}", Clock::get().unwrap().unix_timestamp);
     msg!("Invoice created: {}", invoice.created);
+
     require!(
         Clock::get().unwrap().unix_timestamp > invoice.created,
         InvoiceError::InvoiceStillValid
@@ -22,6 +23,10 @@ pub fn handler(ctx: Context<ExpireInvoice>) -> Result<()> {
     invoice.expired = true;
 
     msg!("Invoice expired: {}", invoice.uuid);
+    emit!(CreateInvoiceEvent{
+        topic: "Invoice expired".to_string(),
+        uuid: invoice.uuid
+    });
 
     Ok(())
 }

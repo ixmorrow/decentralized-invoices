@@ -17,3 +17,32 @@ pub struct Invoice {
     pub created: i64,
     pub bump: u8
 }
+
+#[event]
+pub struct CreateInvoiceEvent {
+    #[index]
+    pub topic: String,
+    pub uuid: u64
+}
+
+#[event]
+pub struct PayInvoiceEvent {
+    #[index]
+    pub topic: String,
+    pub uuid: u64,
+    pub amount: u64
+}
+
+#[event]
+pub struct ExpireInvoiceEvent {
+    #[index]
+    pub topic: String,
+    pub uuid: u64,
+}
+
+#[event]
+pub struct UpdateInvoiceEvent {
+    #[index]
+    pub topic: String,
+    pub uuid: u64,
+}

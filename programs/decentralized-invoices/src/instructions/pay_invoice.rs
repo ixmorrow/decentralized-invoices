@@ -20,6 +20,11 @@ pub fn handler(ctx: Context<PayInvoice>) -> Result<()> {
 
     msg!("Invoice paid: {}", ctx.accounts.invoice.uuid);
     msg!("Amount: {}", ctx.accounts.invoice.amount.unwrap());
+    emit!(PayInvoiceEvent{
+        topic: "Invoice paid".to_string(),
+        uuid: ctx.accounts.invoice.uuid,
+        amount: ctx.accounts.invoice.amount.unwrap()
+    });
 
     Ok(())
 }
