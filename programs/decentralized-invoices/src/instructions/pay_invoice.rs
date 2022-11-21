@@ -8,19 +8,29 @@ use {
 };
 
 pub fn handler(ctx: Context<PayInvoice>) -> Result<()> {
+    msg!("Paying invoice...");
+
     require!(
-        Clock::get().unwrap().unix_timestamp < ctx.accounts.invoice.created + 172800,
+        ctx.accounts.invoice.expired != true,
         InvoiceError::InvoiceExpired
     );
 
     transfer(ctx.accounts.transfer_ctx(), ctx.accounts.invoice.amount)?;
+    ctx.accounts.invoice.paid = true;
+
+    msg!("Invoice paid: {}", ctx.accounts.invoice.uuid);
+    msg!("Amount: {}", ctx.accounts.invoice.amount);
 
     Ok(())
 }
 
 #[derive(Accounts)]
 pub struct PayInvoice<'info> {
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = [&invoice.uuid.to_le_bytes(), INVOICE_SEED.as_bytes(), merchant.key().as_ref()],
+        bump = invoice.bump
+    )]
     pub invoice: Account<'info, Invoice>,
     #[account(
         mut,
