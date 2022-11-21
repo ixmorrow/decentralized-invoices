@@ -1,4 +1,11 @@
-use anchor_lang::prelude::*;
+use {
+    anchor_lang::prelude::*,
+    {instructions::*}
+};
+
+pub mod instructions;
+pub mod state;
+pub mod errors;
 
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
@@ -6,10 +13,11 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 pub mod decentralized_invoices {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        Ok(())
+    pub fn create_invoice(ctx: Context<CreateInvoice>, uuid: u64, amount: u64) -> Result<()> {
+        create_invoice::handler(ctx, uuid, amount)
+    }
+
+    pub fn pay_invoice(ctx: Context<PayInvoice>) -> Result<()> {
+        pay_invoice::handler(ctx)
     }
 }
-
-#[derive(Accounts)]
-pub struct Initialize {}
