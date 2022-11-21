@@ -7,8 +7,15 @@ use {
 pub fn handler(ctx: Context<ExpireInvoice>) -> Result<()> {
     let invoice = &mut ctx.accounts.invoice;
 
+    // for testing purposes, expiring invoices before 48 hrs
+    // require!(
+    //     Clock::get().unwrap().unix_timestamp > invoice.created + 172800,
+    //     InvoiceError::InvoiceStillValid
+    // );
+    msg!("Current timestamp: {}", Clock::get().unwrap().unix_timestamp);
+    msg!("Invoice created: {}", invoice.created);
     require!(
-        Clock::get().unwrap().unix_timestamp > invoice.created + 172800,
+        Clock::get().unwrap().unix_timestamp > invoice.created,
         InvoiceError::InvoiceStillValid
     );
 

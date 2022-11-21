@@ -99,4 +99,41 @@ describe("decentralized-invoices", async () => {
     console.log("Invoice paid: ", tx)
   })
 
+  it("Create Second Invoice", async () => {
+    let uuid = new anchor.BN(2)
+    const [invoicePda, invoiceBump] = await PublicKey.findProgramAddress(
+      [uuid.toArrayLike(Buffer, 'le', 8), Buffer.from("invoice"), merchant.publicKey.toBuffer()],
+      program.programId
+    )
+    const tx = await program.methods.createInvoice(uuid, new anchor.BN(5))
+    .accounts({
+      merchant: merchant.publicKey,
+      customer: customer.publicKey,
+      invoice: invoicePda,
+      paymentMint: tokenMint,
+      systemProgram: SystemProgram.programId
+    })
+    .signers([merchant])
+    .rpc()
+    console.log("Invoice created: ", tx)
+  })
+
+  it("Expire Invoice", async () => {
+    await delay(2000)
+    let uuid = new anchor.BN(2)
+    const [invoicePda, invoiceBump] = await PublicKey.findProgramAddress(
+      [uuid.toArrayLike(Buffer, 'le', 8), Buffer.from("invoice"), merchant.publicKey.toBuffer()],
+      program.programId
+    )
+    const tx = await program.methods.expireInvoice()
+    .accounts({
+      merchant: merchant.publicKey,
+      invoice: invoicePda
+    })
+    .signers([merchant])
+    .rpc()
+    console.log("Invoice expired: ", tx)
+  })
+
+
 })
