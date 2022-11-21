@@ -7,7 +7,7 @@ pub mod instructions;
 pub mod state;
 pub mod errors;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("JCjA4ujSA9usvV2HJUZaUDaBwNNK1dCHhjaBwDYP1rPs");
 
 #[program]
 pub mod decentralized_invoices {
