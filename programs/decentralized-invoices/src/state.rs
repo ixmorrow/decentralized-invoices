@@ -8,10 +8,10 @@ pub const INVOICE_SEED: &str = "invoice";
 #[account]
 pub struct Invoice {
     pub uuid: u64,
-    pub customer: Pubkey,
+    pub customer: Option<Pubkey>,
     pub merchant: Pubkey,
-    pub currency: Pubkey,
-    pub amount: u64,
+    pub currency: Option<Pubkey>,
+    pub amount: Option<u64>,
     pub paid: bool,
     pub expired: bool,
     pub created: i64,

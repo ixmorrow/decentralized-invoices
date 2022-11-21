@@ -24,4 +24,8 @@ pub mod decentralized_invoices {
     pub fn expire_invoice(ctx: Context<ExpireInvoice>) -> Result<()> {
         expire_invoice::handler(ctx)
     }
+
+    pub fn update_invoice(ctx: Context<UpdateInvoice>, ix: UpdateInvoiceIx) -> Result<()> {
+        update_invoice::handler(ctx, ix)
+    }
 }

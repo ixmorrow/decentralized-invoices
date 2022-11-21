@@ -8,10 +8,10 @@ use {
 
 pub fn handler(ctx: Context<CreateInvoice>, uuid: u64, amount: u64) -> Result<()> {
     let invoice = &mut ctx.accounts.invoice;
-    invoice.customer = ctx.accounts.customer.key();
+    invoice.customer = Some(ctx.accounts.customer.key());
     invoice.merchant = ctx.accounts.merchant.key();
-    invoice.currency = ctx.accounts.payment_mint.key();
-    invoice.amount = amount;
+    invoice.currency = Some(ctx.accounts.payment_mint.key());
+    invoice.amount = Some(amount);
     invoice.paid = false;
     invoice.expired = false;
     invoice.created = Clock::get().unwrap().unix_timestamp;

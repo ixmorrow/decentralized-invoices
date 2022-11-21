@@ -15,11 +15,11 @@ pub fn handler(ctx: Context<PayInvoice>) -> Result<()> {
         InvoiceError::InvoiceExpired
     );
 
-    transfer(ctx.accounts.transfer_ctx(), ctx.accounts.invoice.amount)?;
+    transfer(ctx.accounts.transfer_ctx(), ctx.accounts.invoice.amount.unwrap())?;
     ctx.accounts.invoice.paid = true;
 
     msg!("Invoice paid: {}", ctx.accounts.invoice.uuid);
-    msg!("Amount: {}", ctx.accounts.invoice.amount);
+    msg!("Amount: {}", ctx.accounts.invoice.amount.unwrap());
 
     Ok(())
 }
@@ -34,7 +34,7 @@ pub struct PayInvoice<'info> {
     pub invoice: Account<'info, Invoice>,
     #[account(
         mut,
-        constraint = customer.key() == invoice.customer
+        constraint = customer.key() == invoice.customer.unwrap()
     )]
     pub customer: Signer<'info>,
     /// CHECK: not reading data from this account
@@ -52,7 +52,7 @@ pub struct PayInvoice<'info> {
     )]
     pub merchant_token_acct: Account<'info, TokenAccount>,
     #[account(
-        constraint = payment_mint.key() == invoice.currency
+        constraint = payment_mint.key() == invoice.currency.unwrap()
     )]
     pub payment_mint: Account<'info, Mint>,
     pub token_program: Program<'info, Token>

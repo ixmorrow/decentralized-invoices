@@ -14,6 +14,8 @@ pub fn handler(ctx: Context<ExpireInvoice>) -> Result<()> {
 
     invoice.expired = true;
 
+    msg!("Invoice expired: {}", invoice.uuid);
+
     Ok(())
 }
 
